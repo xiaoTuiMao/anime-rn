@@ -1,8 +1,7 @@
-name: Beta Release
+name: Beta Release Test
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - 'feat/init'
 
@@ -10,7 +9,6 @@ jobs:
   beta-release:
     name: Beta Release
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -89,4 +87,4 @@ jobs:
 
       - name: Push Changes
         run: |
-          git push origin HEAD:${{ github.event.pull_request.base.ref }}
+          git push origin HEAD:feat/init
