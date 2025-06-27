@@ -1,7 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
-import { Base } from '@anime-rn/base'
+import { Base } from 'anime-rn-base'
 
 export default function App() {
   return (

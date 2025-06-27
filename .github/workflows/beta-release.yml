@@ -10,6 +10,9 @@ jobs:
   beta-release:
     name: Beta Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     if: github.event.pull_request.merged == true
     steps:
       - name: Checkout Repo
@@ -21,7 +24,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'yarn'
           registry-url: 'https://registry.npmjs.org'
 
@@ -60,6 +63,7 @@ jobs:
             fi
           else
             # 如果无法解析，使用默认版本
+            echo "无法解析切换至默认"
             NEW_VERSION="1.0.0-beta.1"
           fi
 

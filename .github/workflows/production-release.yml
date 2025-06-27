@@ -1,8 +1,7 @@
 name: Production Release
 
 on:
-  pull_request:
-    types: [closed]
+  push:
     branches:
       - main
 
@@ -10,9 +9,9 @@ jobs:
   production-release:
     name: Production Release
     runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.merged == true &&
-      startsWith(github.event.pull_request.head.ref, 'release/')
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -23,7 +22,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 22
           cache: 'yarn'
           registry-url: 'https://registry.npmjs.org'
 
@@ -108,7 +107,7 @@ jobs:
             Version: ${{ steps.current-version.outputs.new_version }}
 
             ### Changes
-            - Production release from release branch
+            - Production release from main branch
             - Updated from beta version to stable release
 
             ### Installation
