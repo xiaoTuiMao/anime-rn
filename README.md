@@ -1,5 +1,4 @@
 # Anime RN
-
 一个用于 React Native 组件开发的 monorepo 仓库，使用 Lerna 进行管理。
 
 ## 项目结构
