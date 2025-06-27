@@ -58,6 +58,7 @@ jobs:
             fi
           else
             # 如果无法解析，使用默认版本
+            echo "无法解析切换至默认"
             NEW_VERSION="1.0.0-beta.1"
           fi
 
