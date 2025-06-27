@@ -1,5 +1,5 @@
 {
-  "name": "@anime-rn/base",
+  "name": "anime-rn-base",
   "version": "0.0.1",
   "description": "Base component with react-native-reanimated animation",
   "main": "lib/index.js",
