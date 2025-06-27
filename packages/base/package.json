@@ -1,6 +1,6 @@
 {
   "name": "anime-rn-base",
-  "version": "0.0.1-beta.2",
+  "version": "0.0.1-beta.3",
   "description": "Base component with react-native-reanimated animation",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
