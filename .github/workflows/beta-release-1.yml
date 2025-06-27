@@ -9,6 +9,9 @@ jobs:
   beta-release:
     name: Beta Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v4
