@@ -1,0 +1,92 @@
+name: Beta Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - 'feat/init'
+
+jobs:
+  beta-release:
+    name: Beta Release
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'yarn'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install Dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Setup Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Get Current Version
+        id: current-version
+        run: |
+          # 获取当前版本号
+          CURRENT_VERSION=$(npx lerna list --json | jq -r '.[0].version')
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+
+          # 解析版本号
+          if [[ $CURRENT_VERSION =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)(.*)$ ]]; then
+            MAJOR="${BASH_REMATCH[1]}"
+            MINOR="${BASH_REMATCH[2]}"
+            PATCH="${BASH_REMATCH[3]}"
+            SUFFIX="${BASH_REMATCH[4]}"
+
+            # 如果是 beta 版本，增加 beta 号
+            if [[ $SUFFIX =~ -beta\.([0-9]+)$ ]]; then
+              BETA_NUM=$((${BASH_REMATCH[1]} + 1))
+              NEW_VERSION="$MAJOR.$MINOR.$PATCH-beta.$BETA_NUM"
+            else
+              # 如果不是 beta 版本，创建新的 beta 版本
+              NEW_VERSION="$MAJOR.$MINOR.$PATCH-beta.1"
+            fi
+          else
+            # 如果无法解析，使用默认版本
+            NEW_VERSION="1.0.0-beta.1"
+          fi
+
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Update Package Versions
+        run: |
+          # 使用 lerna 更新版本号
+          npx lerna version ${{ steps.current-version.outputs.new_version }} --no-git-tag-version --yes
+
+          # 提交版本更新
+          git add .
+          git commit -m "chore: bump version to ${{ steps.current-version.outputs.new_version }} [skip ci]"
+
+      - name: Publish Beta Packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          # 发布 beta 版本到 npm
+          npx lerna publish from-package --dist-tag beta --yes
+
+      - name: Create Git Tag
+        run: |
+          # 创建 git tag
+          git tag -a "v${{ steps.current-version.outputs.new_version }}" -m "Release ${{ steps.current-version.outputs.new_version }}"
+          git push origin "v${{ steps.current-version.outputs.new_version }}"
+
+      - name: Push Changes
+        run: |
+          git push origin HEAD:${{ github.event.pull_request.base.ref }}
