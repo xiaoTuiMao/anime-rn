@@ -56,6 +56,7 @@ module.exports = [
       'node_modules/**',
       '**/lib/**',
       '**/dist/**',
+      '**/docs/**',
       '**/build/**',
       '**/coverage/**',
       '*.config.js',
